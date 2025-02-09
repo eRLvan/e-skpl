@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eSKPL Kemenkeu</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        #feedback-section {
+            text-align: center;
+        }
+
+        #stars {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        #stars div {
+            text-align: center;
+            flex: 1 1 auto;
+        }
+
+        #stars img {
+            width: 100%;
+            max-width: 100px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        #stars img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #stars p {
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+        #feedback-section {
+            display: none;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Apakah anda puas dengan layanan kami?</h1>
+    <div id="stars">
+        <div class="star" data-value="1">
+            <img src="./image/sangat-tidak-puas.jpeg" alt="Sangat Puas">
+            <p>Sangat tidak puas</p>
+        </div>
+        <div class="star" data-value="2">
+            <img src="./image/tidak-puas.jpeg" alt="Puas">
+            <p>Tidak puas</p>
+        </div>
+        <div class="star" data-value="3">
+            <img src="./image/netral.jpeg" alt="Netral">
+            <p>Netral</p>
+        </div>
+        <div class="star" data-value="4">
+            <img src="./image/puas.jpeg" alt="Tidak Puas">
+            <p>Puas</p>
+        </div>
+        <div class="star" data-value="5">
+            <img src="./image/sangat-puas.jpeg" alt="Sangat Tidak Puas">
+            <p>Sangat puas</p>
+        </div>
+    </div>
+
+    <form id="rating-form" target="hidden-iframe"
+        action="https://script.google.com/macros/s/AKfycbxo3EE66T6GGLdpT0O1jc1ZWR8FCMIE_c4AnX1GB6GUCAATdTqLVM4rB9SVVqdD6U2d3w/exec"
+        method="POST">
+        <input type="hidden" id="rating" name="rating" value="0">
+        <input type="hidden" id="unit" name="unit">
+        <input type="hidden" id="nama" name="nama">
+        <input type="hidden" id="return-url" name="return_url">
+        <input type="hidden" id="user-agent" name="user_agent">
+        <input type="hidden" id="referer" name="referer">
+        <input type="hidden" id="origin" name="origin">
+        <input type="hidden" id="sec-ch-ua-platform" name="sec_ch_ua_platform">
+
+        <div id="feedback-section">
+            <label for="feedback">Kritik dan saran:</label><br>
+            <textarea id="feedback" name="feedback" rows="4" cols="50"
+                placeholder="Sampaikan kiritk dan saran anda ..."></textarea><br>
+            <button type="submit">Kirim</button>
+        </div>
+    </form>
+
+    <iframe name="hidden-iframe" style="display:none;"></iframe>
+
+    <script>
+        // Function to get query parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Set query parameter values in hidden inputs
+        const unit = getQueryParam('unit') || '';
+        document.getElementById('unit').value = unit;
+
+        const nama = getQueryParam('nama') || '';
+        document.getElementById('nama').value = nama;
+
+        const returnUrl = getQueryParam('return_url') || '';
+        document.getElementById('return-url').value = returnUrl;
+
+        // Collect additional data
+        const userAgent = navigator.userAgent;
+        document.getElementById('user-agent').value = userAgent;
+
+        const referer = document.referrer || 'No Referer';
+        document.getElementById('referer').value = referer;
+
+        const origin = window.location.origin;
+        document.getElementById('origin').value = origin;
+
+        if (navigator.userAgentData) {
+            navigator.userAgentData.getHighEntropyValues(['platform']).then(ua => {
+                document.getElementById('sec-ch-ua-platform').value = ua.platform || 'Unknown';
+            });
+        } else {
+            document.getElementById('sec-ch-ua-platform').value = 'Not Supported';
+        }
+
+        const stars = document.querySelectorAll('.star');
+        const feedbackSection = document.getElementById('feedback-section');
+        let autoSubmitLock = false;
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-value');
+                document.getElementById('rating').value = rating;
+
+                stars.forEach(s => s.classList.remove('checked'));
+                for (let i = 0; i < rating; i++) {
+                    stars[i].classList.add('checked');
+                }
+
+                if (rating <= 3) {
+                    feedbackSection.style.display = 'block'; // Show feedback for 1–3 stars
+                } else {
+                    feedbackSection.style.display = 'none'; // Hide feedback for 4–5 stars
+                    if (!autoSubmitLock) {
+                        autoSubmitLock = true;
+                        document.getElementById('rating-form').submit(); // Auto-submit the form
+
+                        // Wait for a short delay before redirecting to ensure the form submission completes
+                        setTimeout(() => {
+                            const returnUrl = document.getElementById('return-url').value;
+                            if (returnUrl) {
+                                window.location.href = returnUrl;
+                            }
+                        }, 500);
+                    }
+                }
+            });
+        });
+
+        // Redirect to return_url after form submission
+        document.getElementById('rating-form').addEventListener('submit', function () {
+            const returnUrl = document.getElementById('return-url').value;
+
+            console.log('Redirecting to:', returnUrl);
+            if (returnUrl) {
+                setTimeout(() => window.location.href = returnUrl, 500);
+            }
+        });
+    </script>
+</body>
+
+</html>
