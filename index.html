@@ -10,8 +10,8 @@
             text-align: center;
         }
 
-        #feedback-section {
-            text-align: center;
+        .hidden {
+            display: none;
         }
 
         #stars {
@@ -45,6 +45,7 @@
         }
 
         #feedback-section {
+            text-align: center;
             display: none;
             margin-top: 1rem;
         }
@@ -52,51 +53,56 @@
 </head>
 
 <body>
-    <h1>Apakah anda puas dengan layanan kami?</h1>
-    <div id="stars">
-        <div class="star" data-value="1">
-            <img src="./image/sangat-tidak-puas.jpeg" alt="Sangat Puas">
-            <p>Sangat tidak puas</p>
+    <h1 id="thank-you-message" class="hidden">Terima Kasih! Anda telah memberikan penilaian.</h1>
+
+    <div id="stars-section">
+        <h1>Apakah anda puas dengan layanan kami?</h1>
+        <div id="stars">
+            <div class="star" data-value="1">
+                <img src="./image/sangat-tidak-puas.jpeg" alt="Sangat Puas">
+                <p>Sangat tidak puas</p>
+            </div>
+            <div class="star" data-value="2">
+                <img src="./image/tidak-puas.jpeg" alt="Puas">
+                <p>Tidak puas</p>
+            </div>
+            <div class="star" data-value="3">
+                <img src="./image/netral.jpeg" alt="Netral">
+                <p>Netral</p>
+            </div>
+            <div class="star" data-value="4">
+                <img src="./image/puas.jpeg" alt="Tidak Puas">
+                <p>Puas</p>
+            </div>
+            <div class="star" data-value="5">
+                <img src="./image/sangat-puas.jpeg" alt="Sangat Tidak Puas">
+                <p>Sangat puas</p>
+            </div>
         </div>
-        <div class="star" data-value="2">
-            <img src="./image/tidak-puas.jpeg" alt="Puas">
-            <p>Tidak puas</p>
-        </div>
-        <div class="star" data-value="3">
-            <img src="./image/netral.jpeg" alt="Netral">
-            <p>Netral</p>
-        </div>
-        <div class="star" data-value="4">
-            <img src="./image/puas.jpeg" alt="Tidak Puas">
-            <p>Puas</p>
-        </div>
-        <div class="star" data-value="5">
-            <img src="./image/sangat-puas.jpeg" alt="Sangat Tidak Puas">
-            <p>Sangat puas</p>
-        </div>
+
+        <form id="rating-form" target="hidden-iframe"
+            action="https://script.google.com/macros/s/AKfycbxo3EE66T6GGLdpT0O1jc1ZWR8FCMIE_c4AnX1GB6GUCAATdTqLVM4rB9SVVqdD6U2d3w/exec"
+            method="POST">
+            <input type="hidden" id="rating" name="rating" value="0">
+            <input type="hidden" id="unit" name="unit">
+            <input type="hidden" id="nama" name="nama">
+            <input type="hidden" id="return-url" name="return_url">
+            <input type="hidden" id="user-agent" name="user_agent">
+            <input type="hidden" id="referer" name="referer">
+            <input type="hidden" id="origin" name="origin">
+            <input type="hidden" id="sec-ch-ua-platform" name="sec_ch_ua_platform">
+
+            <div id="feedback-section">
+                <label for="feedback">Kritik dan saran:</label><br>
+                <textarea id="feedback" name="feedback" rows="4" cols="50"
+                    placeholder="Sampaikan kiritk dan saran anda ..."></textarea><br>
+                <button type="submit">Kirim</button>
+            </div>
+        </form>
+
+        <iframe name="hidden-iframe" style="display:none;"></iframe>
     </div>
 
-    <form id="rating-form" target="hidden-iframe"
-        action="https://script.google.com/macros/s/AKfycbxo3EE66T6GGLdpT0O1jc1ZWR8FCMIE_c4AnX1GB6GUCAATdTqLVM4rB9SVVqdD6U2d3w/exec"
-        method="POST">
-        <input type="hidden" id="rating" name="rating" value="0">
-        <input type="hidden" id="unit" name="unit">
-        <input type="hidden" id="nama" name="nama">
-        <input type="hidden" id="return-url" name="return_url">
-        <input type="hidden" id="user-agent" name="user_agent">
-        <input type="hidden" id="referer" name="referer">
-        <input type="hidden" id="origin" name="origin">
-        <input type="hidden" id="sec-ch-ua-platform" name="sec_ch_ua_platform">
-
-        <div id="feedback-section">
-            <label for="feedback">Kritik dan saran:</label><br>
-            <textarea id="feedback" name="feedback" rows="4" cols="50"
-                placeholder="Sampaikan kiritk dan saran anda ..."></textarea><br>
-            <button type="submit">Kirim</button>
-        </div>
-    </form>
-
-    <iframe name="hidden-iframe" style="display:none;"></iframe>
 
     <script>
         // Function to get query parameters
@@ -160,6 +166,9 @@
                             const returnUrl = document.getElementById('return-url').value;
                             if (returnUrl) {
                                 window.location.href = returnUrl;
+                            } else {
+                                document.getElementById('thank-you-message').classList.remove('hidden');
+                                document.getElementById('stars-section').classList.add('hidden');
                             }
                         }, 500);
                     }
@@ -171,9 +180,11 @@
         document.getElementById('rating-form').addEventListener('submit', function () {
             const returnUrl = document.getElementById('return-url').value;
 
-            console.log('Redirecting to:', returnUrl);
             if (returnUrl) {
                 setTimeout(() => window.location.href = returnUrl, 500);
+            } else {
+                document.getElementById('thank-you-message').classList.remove('hidden');
+                document.getElementById('stars-section').classList.add('hidden');
             }
         });
     </script>
